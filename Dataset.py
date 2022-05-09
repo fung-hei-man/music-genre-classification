@@ -4,6 +4,8 @@ import glob
 import numpy as np
 import matplotlib.pyplot as plt
 
+from BeatLoader import BeatLoader
+
 
 class Dataset:
     def __init__(self):
@@ -30,29 +32,37 @@ class Dataset:
             self.sr = sr
             self.audios.append(y)
             self.labels.append(idx)
+
+            self.calculate_features(y, path)
             print(f'Loaded all {genre} audios')
 
-            # calculate features
-            self.calculate_stft(y)
-            self.calculate_mfcc(y)
+    def calculate_features(self, y, path):
+        # self.calculate_stft(y)
+        # self.calculate_mfcc(y)
+        beat_loader = self.calculate_rhythmic_feat(path)
 
-            # plot graph for first audio of each genre
-            if path.endswith(".00000.wav"):
-                self.plot_stft(len(self.audios) - 1, genre)
-                self.plot_mfcc(len(self.audios) - 1, genre)
+        # plot graph for first audio of each genre
+        if path.endswith(".00000.wav"):
+            # self.plot_stft(len(self.audios) - 1, genre)
+            # self.plot_mfcc(len(self.audios) - 1, genre)
+            self.plot_beats(beat_loader)
 
     # =================================================================
     #                           Calculations
     # =================================================================
     def calculate_stft(self, y):
         stft = librosa.stft(y=y)
-        print(stft.shape)
         self.stft.append(stft)
 
     def calculate_mfcc(self, y):
         mfcc = librosa.feature.mfcc(y=y, sr=self.sr, n_mfcc=10)
-        print(mfcc.shape)
         self.mfcc.append(librosa.feature.mfcc(y=y, sr=self.sr, n_mfcc=10))
+
+    def calculate_rhythmic_feat(self, path):
+        beat_loader = BeatLoader(path)
+        beat_loader.load_beats()
+
+        return beat_loader
 
     # =================================================================
     #                           Plotting
@@ -77,6 +87,8 @@ class Dataset:
     def plot_mfcc(self, idx, genre):
         title = f'MFCC Sample for {genre.capitalize()} Genre'
         path = f'output/mfcc/{genre}.png'
-        data = librosa.amplitude_to_db(np.abs(self.stft[idx]), ref=np.max)
 
         self.plot_graph(self.mfcc[idx], title, path, x_axis='time', y_axis='linear')
+
+    def plot_beats(self, beat_loader):
+        beat_loader.plot_wave_and_beat()
