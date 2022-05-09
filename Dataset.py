@@ -19,8 +19,8 @@ class Dataset:
         # features used
         self.stft = []  # 12-dim
         self.mfcc = []  # 10-dim
-        self.rhythmicFeat = []  # 6-dim
-        self.pitchFeat = []  # 5-dim
+        self.rhythmic_feats = []  # 6-dim
+        self.pitch_feats = []  # 5-dim
 
         self.load_audios()
 
@@ -56,11 +56,15 @@ class Dataset:
 
     def calculate_mfcc(self, y):
         mfcc = librosa.feature.mfcc(y=y, sr=self.sr, n_mfcc=10)
-        self.mfcc.append(librosa.feature.mfcc(y=y, sr=self.sr, n_mfcc=10))
+        self.mfcc.append(mfcc)
 
     def calculate_rhythmic_feat(self, path):
         beat_loader = BeatLoader(path)
         beat_loader.load_beats()
+        beat_loader.calculate_beat_histogram()
+
+        rhythmicFeats = beat_loader.get_rhythmic_feats()
+        self.rhythmic_feats.append(rhythmicFeats)
 
         return beat_loader
 
@@ -90,5 +94,6 @@ class Dataset:
 
         self.plot_graph(self.mfcc[idx], title, path, x_axis='time', y_axis='linear')
 
-    def plot_beats(self, beat_loader):
-        beat_loader.plot_wave_and_beat()
+    def plot_beats(self, beat_loader, genre):
+        beat_loader.plot_wave_and_beat(title=f'Beat Estimation Sample for {genre}', path=f'output/beat/{genre}.png')
+        beat_loader.plot_beat_hist(title=f'Beat Histogram Sample for {genre}', path=f'output/beat_hist/{genre}.png')
