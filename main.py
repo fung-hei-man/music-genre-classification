@@ -1,4 +1,5 @@
-CATEGORY = ['blues', 'classical', 'country', 'disco', 'hiphop', 'jazz', 'metal', 'pop', 'reggae', 'rock']
+from Dataset import Dataset
+
 
 if __name__ == '__main__':
-    print('Hello World')
+    dataset = Dataset()
