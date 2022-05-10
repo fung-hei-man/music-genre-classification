@@ -23,10 +23,12 @@ class Dataset:
         # features used
         self.mel_specs = []  # (128, 1292)
         self.mfccs = []  # (10, 1292)
-        self.rhythmic_feats = []  # (5, 1) -> (5, 1292)
+        self.tempograms = []  #
         self.chromagrams = []  # (12, 1292)
 
-        self.load_audios()
+        # helpers
+        self.max_dim = -1
+        self.hop_length = 512
 
     def load_audios(self):
         for idx, genre in enumerate(self.genres):
@@ -47,14 +49,14 @@ class Dataset:
     def calculate_features(self, y, path, genre):
         self.calculate_mel_spec(y)
         self.calculate_mfcc(y)
-        beat_loader = self.calculate_rhythmic_feat(path)
+        self.calculate_tempogram(y)
         self.calculate_chromagram(y)
 
         # plot graph for first audio of each genre
         if detail_mode(path):
             self.plot_mel_spec(len(self.audios) - 1, genre)
             self.plot_mfcc(len(self.audios) - 1, genre)
-            self.plot_beats(beat_loader, genre)
+            self.plot_tempogram(len(self.audios) - 1, genre)
             self.plot_chromagram(len(self.audios) - 1, genre)
 
     # =================================================================
@@ -68,15 +70,13 @@ class Dataset:
         mfcc = librosa.feature.mfcc(y=y, sr=self.sr, n_mfcc=10)
         self.mfccs.append(mfcc)
 
-    def calculate_rhythmic_feat(self, path):
-        beat_loader = BeatLoader(path, detail_mode(path))
-        beat_loader.load_beats()
-        beat_loader.calculate_beat_histogram()
+    def calculate_tempogram(self, y):
+        oenv = librosa.onset.onset_strength(y=y, sr=self.sr, hop_length=self.hop_length)
+        tempogram = librosa.feature.tempogram(onset_envelope=oenv, sr=self.sr, hop_length=self.hop_length)
+        self.tempograms.append(tempogram)
 
-        rhythmic_feats = beat_loader.get_rhythmic_feats()
-        self.rhythmic_feats.append(rhythmic_feats)
-
-        return beat_loader
+        tempo = librosa.beat.tempo(onset_envelope=oenv, sr=self.sr, hop_length=self.hop_length)[0]
+        self.tempos.append(tempo)
 
     def calculate_chromagram(self, y):
         chroma_cq = librosa.feature.chroma_cqt(y=y, sr=self.sr)
@@ -88,7 +88,7 @@ class Dataset:
     def plot_graph(self, data, title, path, y_axis, x_axis, ax_format=None):
         fig, ax = plt.subplots(figsize=(10, 5))
         fig.suptitle(title)
-        img = display.specshow(data, x_axis=x_axis, y_axis=y_axis, sr=self.sr)
+        img = display.specshow(data, x_axis=x_axis, y_axis=y_axis, sr=self.sr, hop_length=self.hop_length)
         fig.colorbar(img, ax=ax, format=ax_format)
 
         fig.savefig(path, bbox_inches='tight', pad_inches=0.25)
@@ -108,11 +108,19 @@ class Dataset:
 
         self.plot_graph(self.mfccs[idx], title, path, x_axis='time', y_axis='linear')
 
-    def plot_beats(self, beat_loader, genre):
-        beat_loader.plot_wave_and_beat(title=f'Beat Estimation Example for {genre.capitalize()}',
-                                       path=f'output/beat/{genre}.png')
-        beat_loader.plot_beat_hist(title=f'Beat Histogram Example for {genre.capitalize()}',
-                                   path=f'output/beat_hist/{genre}.png')
+    def plot_tempogram(self, idx, genre):
+        title = f'Tempogram Example for {genre.capitalize()} Genre'
+        path = f'output/tempogram/{genre}.png'
+
+        fig, ax = plt.subplots(figsize=(10, 5))
+        fig.suptitle(title)
+        librosa.display.specshow(self.tempograms[idx], sr=self.sr, hop_length=self.hop_length, x_axis='time', y_axis='tempo', cmap='magma', ax=ax)
+        ax.axhline(self.tempos[idx], color='w', linestyle='--', alpha=1, label=f'Estimated tempo={self.tempos[idx]}')
+        ax.legend(loc='upper right')
+
+        fig.savefig(path, bbox_inches='tight', pad_inches=0.25)
+        fig.show()
+        fig.clf()
 
     def plot_chromagram(self, idx, genre):
         title = f'Chromagram Example for {genre.capitalize()} Genre'
