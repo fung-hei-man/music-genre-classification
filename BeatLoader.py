@@ -38,10 +38,12 @@ class BeatLoader:
     # =================================================================
 
     def calculate_beat_histogram(self):
-        self.first_bpm, self.first_weight, peak1_spread, \
-            self.second_bpm, self.second_weight, peak2_spread, \
+        self.first_bpm, self.first_weight, _, \
+            self.second_bpm, self.second_weight, _, \
             self.beat_hist = \
             es.BpmHistogramDescriptors()(self.beats_intervals)
+
+        self.relative_amp = self.second_weight / self.first_weight
 
     def get_rhythmic_feats(self):
         if self.print_logs:
