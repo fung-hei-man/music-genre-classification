@@ -24,21 +24,21 @@ class Dataset:
         self.stft = []  # 12-dim
         self.mfcc = []  # 10-dim
         self.rhythmic_feats = []  # 5-dim, without sum
-        self.pitch_feats = []  # 5-dim
+        self.chromagram = []  # 12-dim
 
         self.load_audios()
 
     def load_audios(self):
         for idx, genre in enumerate(self.categories):
             print(f'===== Load {genre.capitalize()} Starts =====')
-            path = f'{self.input_path}{genre}.00000.wav'
-            # for path in glob.glob(f'{self.input_path}{genre}.*.wav'):
-            y, sr = librosa.load(path=path, duration=30)
-            self.sr = sr
-            self.audios.append(y)
-            self.labels.append(idx)
+            # path = f'{self.input_path}{genre}.00000.wav'
+            for path in glob.glob(f'{self.input_path}{genre}.*.wav'):
+                y, sr = librosa.load(path=path, duration=30)
+                self.sr = sr
+                self.audios.append(y)
+                self.labels.append(idx)
 
-            self.calculate_features(y, path, genre)
+                self.calculate_features(y, path, genre)
 
             print(f'===== Load {genre.capitalize()} Ends =====')
 
@@ -46,12 +46,14 @@ class Dataset:
         self.calculate_stft(y)
         self.calculate_mfcc(y)
         beat_loader = self.calculate_rhythmic_feat(path)
+        self.calculate_pitch_feat(y)
 
         # plot graph for first audio of each genre
         if detail_mode(path):
             self.plot_stft(len(self.audios) - 1, genre)
             self.plot_mfcc(len(self.audios) - 1, genre)
             self.plot_beats(beat_loader, genre)
+            self.plot_chromagram(len(self.audios) - 1, genre)
 
     # =================================================================
     #                           Calculations
@@ -73,6 +75,11 @@ class Dataset:
         self.rhythmic_feats.append(rhythmic_feats)
 
         return beat_loader
+
+    def calculate_pitch_feat(self, y):
+        chroma_cq = librosa.feature.chroma_cqt(y=y, sr=self.sr)
+        self.chromagram.append(chroma_cq)
+        print(chroma_cq)
 
     # =================================================================
     #                           Plotting
@@ -104,3 +111,8 @@ class Dataset:
         beat_loader.plot_wave_and_beat(title=f'Beat Estimation Example for {genre.capitalize()}', path=f'output/beat/{genre}.png')
         beat_loader.plot_beat_hist(title=f'Beat Histogram Example for {genre.capitalize()}', path=f'output/beat_hist/{genre}.png')
 
+    def plot_chromagram(self, idx, genre):
+        title = f'Chromagram Example for {genre.capitalize()} Genre'
+        path = f'output/chromagram/{genre}.png'
+
+        self.plot_graph(self.chromagram[idx], title, path, x_axis='time', y_axis='chroma')

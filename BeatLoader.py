@@ -1,4 +1,3 @@
-import essentia
 import essentia.standard as es
 import matplotlib.pyplot as plt
 
