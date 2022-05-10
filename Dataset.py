@@ -1,18 +1,16 @@
 import librosa
 import librosa.display as display
-import glob
+from glob import glob
 import numpy as np
 import matplotlib.pyplot as plt
 
 from BeatLoader import BeatLoader
-
-
-def detail_mode(path):
-    return path.endswith('classical.00000.wav') or path.endswith('rock.00000.wav')
+import Util as utils
 
 
 class Dataset:
     def __init__(self):
+        self.data_num = 10
         self.input_path = 'input/'
         self.genres = ['blues', 'classical', 'country', 'disco', 'hiphop', 'jazz', 'metal', 'pop', 'reggae', 'rock']
         # Audio Sampling Rate: 22050 samples/sec
@@ -29,14 +27,13 @@ class Dataset:
         # helpers
         self.max_dim = -1
         self.hop_length = 512
+        self.tempos = []
 
     def load_audios(self):
         for idx, genre in enumerate(self.genres):
-            # genre = 'classical'
-            # idx = 0
             print(f'===== Load {genre.capitalize()} Starts =====')
+            # for path in glob(f'{self.input_path}{genre}.*.wav'):
             path = f'{self.input_path}{genre}.00000.wav'
-            # for path in glob.glob(f'{self.input_path}{genre}.*.wav'):
             y, sr = librosa.load(path=path, duration=30)
             self.sr = sr
             self.audios.append(y)
@@ -46,6 +43,8 @@ class Dataset:
 
             print(f'===== Load {genre.capitalize()} Ends =====')
 
+        self.max_dim = utils.get_max_dim(self.mel_specs, self.mfccs, self.chromagrams)
+
     def calculate_features(self, y, path, genre):
         self.calculate_mel_spec(y)
         self.calculate_mfcc(y)
@@ -53,7 +52,7 @@ class Dataset:
         self.calculate_chromagram(y)
 
         # plot graph for first audio of each genre
-        if detail_mode(path):
+        if utils.detail_mode(path):
             self.plot_mel_spec(len(self.audios) - 1, genre)
             self.plot_mfcc(len(self.audios) - 1, genre)
             self.plot_tempogram(len(self.audios) - 1, genre)
@@ -132,31 +131,36 @@ class Dataset:
     #                         Preprocess
     # =================================================================
     # mel_spec (12) + mfcc (10) + beat (5) + chromagram (12)
-    def combine_features(self, idx):
-        rhythmic_feats = np.array(self.rhythmic_feats[idx]).reshape(-1, 1)
-        rhythmic_feats = np.array([np.pad(feat, (0, 1291)) for feat in rhythmic_feats])
-        feat = np.concatenate((self.mel_specs[idx], self.mfccs[idx], rhythmic_feats, self.chromagrams[idx]), axis=0)
+    def load_features(self, idx):
+        idx_name = f'00{idx}' if idx <= 9 else f'0{idx}'
+        if glob(f'output/features/{idx_name}.npy'):
+            return np.array(utils.read_feat_from_files(idx_name))
+        else:
+            if len(self.audios) == 0:
+                self.load_audios()
 
-        if idx == 0:
-            # --- Combining Features ---
-            # > mel_spec: (128, 1292)
-            # > mfccs: (10, 1292)
-            # > rhythmic_feats: (5, 1292)
-            # > chromagrams: (12, 1292)
-            # > combined feat: (155, 1292)
-            print('--- Combining Features ---')
-            print('> mel_spec: ', end='')
-            # print(self.mel_spec[idx])
-            print(self.mel_specs[idx].shape)
-            print('> mfccs: ', end='')
-            # print(self.mfccs[idx])
-            print(self.mfccs[idx].shape)
-            print('> rhythmic_feats: ', end='')
-            # print(self.rhythmic_feats[idx])
-            print(rhythmic_feats.shape)
-            print('> chromagrams: ', end='')
-            # print(self.chromagrams[idx])
-            print(self.chromagrams[idx].shape)
-            print(f'> combined feat: {feat.shape}')
+            # pad features to max
+            mel_spec = utils.pad_data(self.mel_specs[idx], self.max_dim)
+            mfcc = utils.pad_data(self.mfccs[idx], self.max_dim)
+            rhythmic_feat = utils.pad_data(np.array(self.tempograms[idx]).reshape(-1, 1), self.max_dim)
+            chromagram = utils.pad_data(self.chromagrams[idx], self.max_dim)
 
-        return feat
+            feat = np.concatenate((mel_spec, mfcc, rhythmic_feat, chromagram), axis=0)
+
+            if idx == 0:
+                # --- Combining Features ---
+                # > mel_spec: (128, 1292)
+                # > mfccs: (10, 1292)
+                # > rhythmic_feat: (5, 1292)
+                # > chromagrams: (12, 1292)
+                # > combined feat: (155, 1292)
+                print('--- Combining Features ---')
+                print(f'Padded all features to {self.max_dim}')
+                print(f'> mel_spec: {mel_spec.shape}')
+                print(f'> mfccs: {mfcc.shape}')
+                print(f'> rhythmic_feat: {rhythmic_feat.shape}')
+                print(f'> chromagrams: {chromagram.shape}')
+                print(f'> combined feat: {feat.shape}')
+
+            utils.write_feat_to_files(idx_name, feat)
+            return np.array(feat)
