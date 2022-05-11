@@ -127,36 +127,38 @@ class Dataset:
     def load_features(self):
         if len(self.features) > 0:
             return self.features
+        else:
+            for genre_idx, genre in enumerate(self.genres):
+                for idx in range(50):
+                    idx_name = f'00{idx}' if idx <= 9 else f'0{idx}'
+                    self.labels.append(genre)
 
-        for genre_idx, genre in enumerate(self.genres):
-            for idx in range(50):
-                idx_name = f'00{idx}' if idx <= 9 else f'0{idx}'
-                self.labels.append(genre)
+                    if glob(f'output/features/{genre}/{idx_name}.npy'):
+                        self.features.append(utils.read_feat_from_files(genre, idx_name))
 
-                if glob(f'output/features/{genre}/{idx_name}.npy'):
-                    self.features.append(utils.read_feat_from_files(genre, idx_name))
+                    else:
+                        if len(self.audios) == 0:
+                            self.load_audios()
 
-                else:
-                    if len(self.audios) == 0:
-                        self.load_audios()
+                        # pad features to max
+                        mel_spec = utils.pad_data(self.mel_specs[idx + genre_idx * 50], self.max_dim)
+                        mfcc = utils.pad_data(self.mfccs[idx + genre_idx * 50], self.max_dim)
+                        tempogram = utils.pad_data(self.tempograms[idx + genre_idx * 50], self.max_dim)
+                        chromagram = utils.pad_data(self.chromagrams[idx + genre_idx * 50], self.max_dim)
 
-                    # pad features to max
-                    mel_spec = utils.pad_data(self.mel_specs[idx + genre_idx * 50], self.max_dim)
-                    mfcc = utils.pad_data(self.mfccs[idx + genre_idx * 50], self.max_dim)
-                    tempogram = utils.pad_data(self.tempograms[idx + genre_idx * 50], self.max_dim)
-                    chromagram = utils.pad_data(self.chromagrams[idx + genre_idx * 50], self.max_dim)
+                        feat = np.concatenate((mel_spec, mfcc, tempogram, chromagram), axis=0)
 
-                    feat = np.concatenate((mel_spec, mfcc, tempogram, chromagram), axis=0)
+                        if idx == 0:
+                            print('--- Combining Features ---')
+                            print(f'Padded all features to {self.max_dim}')
+                            print(f'> mel_spec: {mel_spec.shape}')
+                            print(f'> mfcc: {mfcc.shape}')
+                            print(f'> tempogram: {tempogram.shape}')
+                            print(f'> chromagram: {chromagram.shape}')
+                            print(f'> combined feat: {feat.shape}')
 
-                    if idx == 0:
-                        print('--- Combining Features ---')
-                        print(f'Padded all features to {self.max_dim}')
-                        print(f'> mel_spec: {mel_spec.shape}')
-                        print(f'> mfcc: {mfcc.shape}')
-                        print(f'> tempogram: {tempogram.shape}')
-                        print(f'> chromagram: {chromagram.shape}')
-                        print(f'> combined feat: {feat.shape}')
+                        utils.write_feat_to_files(genre, idx_name, feat)
+                        self.features.append(feat)
 
-                    utils.write_feat_to_files(genre, idx_name, feat)
-                    self.features.append(feat)
-        return self.features
+            print('Loaded all features for all audios')
+            return self.features

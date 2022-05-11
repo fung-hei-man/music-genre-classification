@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 
 
 class Train:
-    def __init__(self):
-        self.dataset = Dataset()
+    def __init__(self, dataset):
+        self.dataset = dataset
         self.confusion_matrix = []
 
         self.X = np.array(self.dataset.load_features())
@@ -32,7 +32,7 @@ class Train:
             y_train = self.label_encoder.transform(y_train)
             y_test = self.label_encoder.transform(y_test)
 
-            model.fit(x_train)
+            model.fit(x_train, y_train)
             y_text_pred = model.predict(x_test)
 
             _, counts = np.unique(y_test, return_counts=True)

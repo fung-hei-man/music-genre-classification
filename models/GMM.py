@@ -6,8 +6,8 @@ import numpy as np
 
 
 class TrainWithGMM:
-    def __init__(self):
-        self.dataset = Dataset()
+    def __init__(self, dataset):
+        self.dataset = dataset
         self.X = np.array(self.dataset.load_features())
         self.Y = np.array(self.dataset.labels)
 
@@ -15,12 +15,14 @@ class TrainWithGMM:
         self.model = GaussianMixture(n_components=10, covariance_type='diag', means_init=self.calculate_init_mean())
 
     def fit(self, x_train):
+        print(f'fitting for {self.name}')
         data = reshape_feats_to_1d(x_train)
         self.model = self.model.fit(data)
 
         return self.model
 
     def predict(self, x_test):
+        print(f'predicting with {self.name}')
         data = reshape_feats_to_1d(x_test)
         return self.model.predict(data)
 
