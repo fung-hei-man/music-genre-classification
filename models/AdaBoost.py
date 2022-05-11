@@ -1,19 +1,16 @@
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
-from sklearn.svm import SVC
-
+from sklearn.ensemble import AdaBoostClassifier
 from utils import reshape_feats_to_1d
 import numpy as np
 
 
-class TrainWithSVC:
+class TrainWithAdaBoost:
     def __init__(self, dataset):
         self.dataset = dataset
         self.X = np.array(self.dataset.load_features())
         self.Y = np.array(self.dataset.labels)
 
-        self.name = 'SVM'
-        self.model = make_pipeline(StandardScaler(), SVC(gamma='auto'))
+        self.name = 'Ada Boost'
+        self.model = AdaBoostClassifier(n_estimators=100, random_state=0)
 
     def fit(self, x_train, y_train):
         print(f'fitting for {self.name}')
