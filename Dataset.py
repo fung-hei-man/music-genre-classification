@@ -4,7 +4,6 @@ from glob import glob
 import numpy as np
 import matplotlib.pyplot as plt
 
-from BeatLoader import BeatLoader
 import Util as utils
 
 
@@ -13,7 +12,6 @@ class Dataset:
         self.data_num = 10
         self.input_path = 'input/'
         self.genres = ['blues', 'classical', 'country', 'disco', 'hiphop', 'jazz', 'metal', 'pop', 'reggae', 'rock']
-        # Audio Sampling Rate: 22050 samples/sec
         self.sr = 0
         self.audios = []
         self.labels = []
@@ -21,7 +19,7 @@ class Dataset:
         # features used
         self.mel_specs = []  # (128, 1292)
         self.mfccs = []  # (10, 1292)
-        self.tempograms = []  #
+        self.tempograms = []  # (384, 1292)
         self.chromagrams = []  # (12, 1292)
 
         # helpers
