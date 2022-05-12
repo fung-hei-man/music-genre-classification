@@ -28,19 +28,19 @@ init_mean: [array([2.600729  , 3.16356326, 3.24003382, ..., 0.        , 0.      
         0.        ,  0.        ]), array([4.25291616, 6.60797775, 6.40400652, ..., 0.        , 0.        ,
        0.        ]), array([4.67507699, 6.81519285, 3.36694632, ..., 0.        , 0.        ,
        0.        ])]
->>> accuracy: 10.2
->>> Training time: 12.21687388420105
+>>> accuracy: 10.6
+>>> Training time: 8.923949241638184
 === KNeighbors ===
->>> accuracy: 25.5
->>> Training time: 1.9775059223175049
+>>> accuracy: 25.7
+>>> Training time: 1.1691257953643799
 === Neural Network ===
->>> accuracy: 34.13333333333334
->>> Training time: 78.53073382377625
+>>> accuracy: 34.266666666666666
+>>> Training time: 78.4641969203949
 === SVM ===
->>> accuracy: 36.9
->>> Training time: 155.0163757801056
+>>> accuracy: 37.0
+>>> Training time: 139.53329992294312
 === AdaBoost ===
->>> accuracy: 33.199999999999996
->>> Training time: 510.2372968196869
+>>> accuracy: 33.28
+>>> Training time: 507.9543709754944
 
 Process finished with exit code 0
