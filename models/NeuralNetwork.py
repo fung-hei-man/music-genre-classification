@@ -15,12 +15,12 @@ class TrainWithNeuralNetwork:
 
     def fit(self, x_train, y_train):
         print(f'fitting for {self.name}')
-        # data = reshape_feats_to_1d(x_train)
-        self.model = self.model.fit(x_train, y_train)
+        data = reshape_feats_to_1d(x_train)
+        self.model = self.model.fit(data, y_train)
 
         return self.model
 
     def predict(self, x_test):
         print(f'predicting with {self.name}')
-        # data = reshape_feats_to_1d(x_test)
-        return self.model.predict(x_test)
+        data = reshape_feats_to_1d(x_test)
+        return self.model.predict(data)

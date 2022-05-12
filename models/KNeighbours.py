@@ -11,7 +11,7 @@ class TrainWithKNeighbors:
         self.Y = np.array(self.dataset.labels)
 
         self.name = 'KNN'
-        self.model = KNeighborsClassifier(n_neighbors=5)
+        self.model = KNeighborsClassifier(n_neighbors=10)
 
     def fit(self, x_train, y_train):
         print(f'fitting for {self.name}')

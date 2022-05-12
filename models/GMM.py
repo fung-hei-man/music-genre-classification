@@ -14,7 +14,7 @@ class TrainWithGMM:
         self.name = 'GMM'
         self.model = GaussianMixture(n_components=10, covariance_type='diag', means_init=self.calculate_init_mean())
 
-    def fit(self, x_train):
+    def fit(self, x_train, _):
         print(f'fitting for {self.name}')
         data = reshape_feats_to_1d(x_train)
         self.model = self.model.fit(data)
