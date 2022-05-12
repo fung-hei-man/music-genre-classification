@@ -1,46 +1,15 @@
-===== Load Blues Complete =====
-===== Load Classical Complete =====
-===== Load Country Complete =====
-===== Load Disco Complete =====
-===== Load Hiphop Complete =====
-===== Load Jazz Complete =====
-===== Load Metal Complete =====
-===== Load Pop Complete =====
-===== Load Reggae Complete =====
-===== Load Rock Complete =====
---- Combining Features ---
-Padded all features to 118
-> mel_spec: (128, 118)
-> mfcc: (26, 118)
-> tempogram: (384, 118)
-> chromagram: (12, 118)
-> combined feat: (550, 118)
 Loaded all features for all audios
-=== GMM ===
-init_mean: [array([2.600729  , 3.16356326, 3.24003382, ..., 0.        , 0.        ,
-       0.        ]), array([0.13231474, 0.11506659, 0.11266407, ..., 0.00080349, 0.00067924,
-       0.00107892]), array([2.36744324, 2.27404966, 2.48812776, ..., 0.        , 0.        ,
-       0.        ]), array([5.28486078, 7.24995296, 5.9591645 , ..., 0.        , 0.        ,
-       0.        ]), array([46.14955068, 41.57709534, 32.78757451, ...,  0.        ,
-        0.        ,  0.        ]), array([0.43427391, 0.40306139, 0.46980212, ..., 0.        , 0.        ,
-       0.        ]), array([ 9.11197937, 10.8831981 , 10.46931682, ...,  0.        ,
-        0.        ,  0.        ]), array([25.97608593, 43.16392145, 36.93865394, ...,  0.        ,
-        0.        ,  0.        ]), array([4.25291616, 6.60797775, 6.40400652, ..., 0.        , 0.        ,
-       0.        ]), array([4.67507699, 6.81519285, 3.36694632, ..., 0.        , 0.        ,
-       0.        ])]
->>> accuracy: 10.6
->>> Training time: 8.923949241638184
 === KNeighbors ===
->>> accuracy: 25.7
->>> Training time: 1.1691257953643799
+>>> accuracy: 40.8
+>>> Training time: 1.2950680255889893
 === Neural Network ===
->>> accuracy: 34.266666666666666
->>> Training time: 78.4641969203949
-=== SVM ===
->>> accuracy: 37.0
->>> Training time: 139.53329992294312
-=== AdaBoost ===
->>> accuracy: 33.28
->>> Training time: 507.9543709754944
+>>> accuracy: 46.1
+>>> Training time: 72.85349297523499
+=== Random Forest ===
+>>> accuracy: 50.6
+>>> Training time: 10.503593921661377
+=== SVC ===
+>>> accuracy: 49.25
+>>> Training time: 130.4512779712677
 
 Process finished with exit code 0

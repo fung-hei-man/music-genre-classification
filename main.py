@@ -1,7 +1,7 @@
 from Dataset import Dataset
 from Train import Train
-from models.AdaBoost import TrainWithAdaBoost
 from models.GMM import TrainWithGMM
+from models.RandomForest import TrainWithRandomForest
 from models.KNeighbours import TrainWithKNeighbors
 from models.NeuralNetwork import TrainWithNeuralNetwork
 from models.SVC import TrainWithSVC
@@ -12,7 +12,7 @@ if __name__ == '__main__':
     dataset = Dataset()
     train = Train(dataset)
 
-    print("=== GMM ===")
+    print('=== GMM ===')
     start_time = time.time()
     gmm = TrainWithGMM(dataset)
     train.train_with_model(gmm)
@@ -30,14 +30,14 @@ if __name__ == '__main__':
     train.train_with_model(nn)
     print(f'>>> Training time: {time.time() - start_time}')
 
-    print('=== SVM ===')
+    print("=== Random Forest ===")
     start_time = time.time()
-    svm_model = TrainWithSVC(dataset)
-    train.train_with_model(svm_model)
+    rf = TrainWithRandomForest(dataset)
+    train.train_with_model(rf)
     print(f'>>> Training time: {time.time() - start_time}')
 
-    print('=== AdaBoost ===')
+    print('=== SVC ===')
     start_time = time.time()
-    adaBoost = TrainWithAdaBoost(dataset)
-    train.train_with_model(adaBoost)
+    svc = TrainWithSVC(dataset)
+    train.train_with_model(svc)
     print(f'>>> Training time: {time.time() - start_time}')
