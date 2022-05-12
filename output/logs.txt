@@ -1,0 +1,44 @@
+===== Load Blues Complete =====
+===== Load Classical Complete =====
+===== Load Country Complete =====
+===== Load Disco Complete =====
+===== Load Hiphop Complete =====
+===== Load Jazz Complete =====
+===== Load Metal Complete =====
+===== Load Pop Complete =====
+===== Load Reggae Complete =====
+===== Load Rock Complete =====
+--- Combining Features ---
+Padded all features to 118
+> mel_spec: (128, 118)
+> mfcc: (26, 118)
+> tempogram: (384, 118)
+> chromagram: (12, 118)
+> combined feat: (550, 118)
+Loaded all features for all audios
+=== GMM ===
+init_mean: [array([2.600729  , 3.16356326, 3.24003382, ..., 0.        , 0.        ,
+       0.        ]), array([0.13231474, 0.11506659, 0.11266407, ..., 0.00080349, 0.00067924,
+       0.00107892]), array([2.36744324, 2.27404966, 2.48812776, ..., 0.        , 0.        ,
+       0.        ]), array([5.28486078, 7.24995296, 5.9591645 , ..., 0.        , 0.        ,
+       0.        ]), array([46.14955068, 41.57709534, 32.78757451, ...,  0.        ,
+        0.        ,  0.        ]), array([0.43427391, 0.40306139, 0.46980212, ..., 0.        , 0.        ,
+       0.        ]), array([ 9.11197937, 10.8831981 , 10.46931682, ...,  0.        ,
+        0.        ,  0.        ]), array([25.97608593, 43.16392145, 36.93865394, ...,  0.        ,
+        0.        ,  0.        ]), array([4.25291616, 6.60797775, 6.40400652, ..., 0.        , 0.        ,
+       0.        ]), array([4.67507699, 6.81519285, 3.36694632, ..., 0.        , 0.        ,
+       0.        ])]
+>>> accuracy: 9.822222222222223
+>>> Training time: 10.375607967376709
+=== KNeighbors ===
+>>> accuracy: 24.637271062271065
+>>> Training time: 1.2831528186798096
+=== Neural Network ===
+>>> accuracy: 34.89847668671198
+>>> Training time: 64.12777304649353
+=== SVM ===
+>>> accuracy: 38.00273280640928
+>>> Training time: 111.58651804924011
+=== AdaBoost ===
+>>> accuracy: 34.19483581777699
+>>> Training time: 681.0478823184967
