@@ -8,7 +8,6 @@ import utils
 
 class Dataset:
     def __init__(self):
-        self.input_path = 'input/'
         self.genres = ['blues', 'classical', 'country', 'disco', 'hiphop', 'jazz', 'metal', 'pop', 'reggae', 'rock']
         self.sr = 0
         self.audios = []
@@ -16,12 +15,14 @@ class Dataset:
         self.labels = []
 
         # features used
-        self.mel_specs = []  # (128, 1292)
-        self.mfccs = []  # (10, 1292)
-        self.tempograms = []  # (384, 1292)
-        self.chromagrams = []  # (12, 1292)
+        self.mel_specs = []  # (128, beat#)
+        self.mfccs = []  # (10, beat#)
+        self.tempograms = []  # (384, beat#)
+        self.chromagrams = []  # (12, beat#)
 
         # helpers
+        self.input_path = 'input/'
+        self.output_graph_path = 'output/graph'
         self.max_dim = -1
         self.hop_length = 512
         self.tempos = []
@@ -40,40 +41,58 @@ class Dataset:
         self.max_dim = utils.get_max_dim(self.mel_specs, self.mfccs, self.chromagrams)
 
     def calculate_features(self, y, path, genre):
-        self.calculate_mel_spec(y)
-        self.calculate_mfcc(y)
-        self.calculate_tempogram(y)
-        self.calculate_chromagram(y)
+        beat_frames = self.get_beats(y)
+        mel_spec = self.calculate_mel_spec(y, beat_frames)
+        mfcc = self.calculate_mfcc(y, beat_frames)
+        tempogram = self.calculate_tempogram(y, beat_frames)
+        chromagram = self.calculate_chromagram(y, beat_frames)
 
         # plot graph for first audio of each genre
         if utils.detail_mode(path):
-            self.plot_mel_spec(len(self.audios) - 1, genre)
-            self.plot_mfcc(len(self.audios) - 1, genre)
-            self.plot_tempogram(len(self.audios) - 1, genre)
-            self.plot_chromagram(len(self.audios) - 1, genre)
+            self.plot_mel_spec(mel_spec, genre)
+            self.plot_mfcc(mfcc, genre)
+            self.plot_tempogram(tempogram, len(self.audios) - 1, genre)
+            self.plot_chromagram(chromagram, genre)
 
     # =================================================================
     #                           Calculations
     # =================================================================
-    def calculate_mel_spec(self, y):
+    def get_beats(self, y):
+        _, beat_frames = librosa.beat.beat_track(y=y, sr=self.sr)
+        return beat_frames
+
+    def calculate_mel_spec(self, y, beat_frames):
         mel_spec = librosa.feature.melspectrogram(y=y)
-        self.mel_specs.append(mel_spec)
+        beat_mel_spec = librosa.util.sync(mel_spec, beat_frames)
 
-    def calculate_mfcc(self, y):
-        mfcc = librosa.feature.mfcc(y=y, sr=self.sr, n_mfcc=10)
-        self.mfccs.append(mfcc)
+        self.mel_specs.append(beat_mel_spec)
+        return mel_spec
 
-    def calculate_tempogram(self, y):
+    def calculate_mfcc(self, y, beat_frames):
+        mfcc = librosa.feature.mfcc(y=y, sr=self.sr, n_mfcc=13)
+        mfcc_delta = librosa.feature.delta(mfcc)
+        beat_mfcc_delta = librosa.util.sync(np.vstack([mfcc, mfcc_delta]), beat_frames)
+
+        self.mfccs.append(beat_mfcc_delta)
+        return mfcc
+
+    def calculate_tempogram(self, y, beat_frames):
         oenv = librosa.onset.onset_strength(y=y, sr=self.sr, hop_length=self.hop_length)
         tempogram = librosa.feature.tempogram(onset_envelope=oenv, sr=self.sr, hop_length=self.hop_length)
-        self.tempograms.append(tempogram)
+        beat_tempogram = librosa.util.sync(tempogram, beat_frames)
+        self.tempograms.append(beat_tempogram)
 
         tempo = librosa.beat.tempo(onset_envelope=oenv, sr=self.sr, hop_length=self.hop_length)[0]
         self.tempos.append(tempo)
 
-    def calculate_chromagram(self, y):
+        return tempogram
+
+    def calculate_chromagram(self, y, beat_frames):
         chroma_cq = librosa.feature.chroma_cqt(y=y, sr=self.sr)
-        self.chromagrams.append(chroma_cq)
+        beat_chroma = librosa.util.sync(chroma_cq, beat_frames, aggregate=np.median)
+
+        self.chromagrams.append(beat_chroma)
+        return chroma_cq
 
     # =================================================================
     #                           Plotting
@@ -88,26 +107,26 @@ class Dataset:
         fig.show()
         fig.clf()
 
-    def plot_mel_spec(self, idx, genre):
+    def plot_mel_spec(self, data, genre):
         title = f'Mel Spectrogram Example for {genre.capitalize()} Genre'
-        path = f'output/mel_spec/{genre}.png'
-        data = librosa.power_to_db(np.abs(self.mel_specs[idx]), ref=np.max)
+        path = f'{self.output_graph_path}/mel_spec/{genre}.png'
+        data = librosa.power_to_db(np.abs(data), ref=np.max)
 
         self.plot_graph(data, title, path, x_axis='time', y_axis='mel', ax_format='%+2.0f dB')
 
-    def plot_mfcc(self, idx, genre):
+    def plot_mfcc(self, data, genre):
         title = f'MFCC Example for {genre.capitalize()} Genre'
-        path = f'output/mfcc/{genre}.png'
+        path = f'{self.output_graph_path}/mfcc/{genre}.png'
 
-        self.plot_graph(self.mfccs[idx], title, path, x_axis='time', y_axis='linear')
+        self.plot_graph(data, title, path, x_axis='time', y_axis='linear')
 
-    def plot_tempogram(self, idx, genre):
+    def plot_tempogram(self, data, idx, genre):
         title = f'Tempogram Example for {genre.capitalize()} Genre'
-        path = f'output/tempogram/{genre}.png'
+        path = f'{self.output_graph_path}/tempogram/{genre}.png'
 
         fig, ax = plt.subplots(figsize=(10, 5))
         fig.suptitle(title)
-        librosa.display.specshow(self.tempograms[idx], sr=self.sr, hop_length=self.hop_length, x_axis='time', y_axis='tempo', cmap='magma', ax=ax)
+        librosa.display.specshow(data, sr=self.sr, hop_length=self.hop_length, x_axis='time', y_axis='tempo', cmap='magma', ax=ax)
         ax.axhline(self.tempos[idx], color='w', linestyle='--', alpha=1, label=f'Estimated tempo={self.tempos[idx]}')
         ax.legend(loc='upper right')
 
@@ -115,11 +134,11 @@ class Dataset:
         fig.show()
         fig.clf()
 
-    def plot_chromagram(self, idx, genre):
+    def plot_chromagram(self, data, genre):
         title = f'Chromagram Example for {genre.capitalize()} Genre'
-        path = f'output/chromagram/{genre}.png'
+        path = f'{self.output_graph_path}/chromagram/{genre}.png'
 
-        self.plot_graph(self.chromagrams[idx], title, path, x_axis='time', y_axis='chroma')
+        self.plot_graph(data, title, path, x_axis='time', y_axis='chroma')
 
     # =================================================================
     #                         Preprocess

@@ -10,7 +10,6 @@ def write_feat_to_files(genre, idx_name, combined_feats):
 
 
 def read_feat_from_files(genre, idx_name):
-    print(f'reading output/features/{genre}/{idx_name}.npy')
     feats = np.load(f'output/features/{genre}/{idx_name}.npy')
     return feats
 

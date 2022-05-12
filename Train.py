@@ -1,4 +1,3 @@
-from Dataset import Dataset
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import KFold
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
@@ -39,8 +38,8 @@ class Train:
             counts = counts.reshape(len(self.dataset.genres), 1)
             self.confusion_matrix.append(confusion_matrix(y_test, y_text_pred) / counts)
 
-        cm_mean = np.array(self.confusion_matrix).mean(axis=0)
-        accuracy = cm_mean.diagonal().mean() * 100
+        cm_mean = np.array(self.confusion_matrix).mean(axis=0) * 100
+        accuracy = cm_mean.diagonal().mean()
         print(f'>>> accuracy: {accuracy}')
 
         self.plot_confusion_matrix(cm_mean, model.name)
@@ -51,8 +50,8 @@ class Train:
         disp.plot()
 
         plt.title(f'Confusion Matrix for {model_name}')
-        plt.xticks(rotation=75)
+        plt.xticks(rotation=60)
 
-        plt.savefig(f'output/cm/{model_name}.png', bbox_inches='tight', pad_inches=0.3)
+        plt.savefig(f'output/graph/cm/{model_name}.png', bbox_inches='tight', pad_inches=0.3)
         plt.show()
         plt.clf()
