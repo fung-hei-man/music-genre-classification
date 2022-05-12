@@ -1,15 +1,18 @@
 Loaded all features for all audios
+=== GMM ===
+>>> accuracy: 11.4
+>>> Training time: 10.02553105354309
 === KNeighbors ===
 >>> accuracy: 40.8
->>> Training time: 1.2950680255889893
+>>> Training time: 1.4329071044921875
 === Neural Network ===
->>> accuracy: 46.1
->>> Training time: 72.85349297523499
+>>> accuracy: 51.4
+>>> Training time: 71.13411092758179
 === Random Forest ===
->>> accuracy: 50.6
->>> Training time: 10.503593921661377
+>>> accuracy: 59.6
+>>> Training time: 10.337994813919067
 === SVC ===
->>> accuracy: 49.25
->>> Training time: 130.4512779712677
+>>> accuracy: 45.2
+>>> Training time: 115.0929946899414
 
 Process finished with exit code 0
