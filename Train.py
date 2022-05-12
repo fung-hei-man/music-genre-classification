@@ -1,5 +1,5 @@
 from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import KFold
+from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import numpy as np
 import matplotlib.pyplot as plt
@@ -21,9 +21,9 @@ class Train:
         return label_encoder
 
     def train_with_model(self, model):
-        kf = KFold(n_splits=5, shuffle=True)
+        kf = StratifiedKFold(n_splits=5, random_state=None, shuffle=False)
 
-        for train_index, test_index in kf.split(self.X):
+        for train_index, test_index in kf.split(self.X, self.Y):
             x_train, x_test = self.X[train_index], self.X[test_index]
             y_train, y_test = self.Y[train_index], self.Y[test_index]
 
