@@ -1,3 +1,10 @@
+--- Combining Features ---
+Padded all features to 118
+> mel_spec: (128, 118)
+> mfcc: (26, 118)
+> tempogram: (384, 118)
+> chromagram: (12, 118)
+> combined feat: (550, 118)
 Loaded all features for all audios
 === GMM ===
 >>> accuracy: 11.4
@@ -6,8 +13,8 @@ Loaded all features for all audios
 >>> accuracy: 41.2
 >>> Training time: 1.4138338565826416
 === Neural Network ===
->>> accuracy: 51.4
->>> Training time: 71.13411092758179
+>>> accuracy: 54.8
+>>> Training time: 117.31081771850586
 === Random Forest ===
 >>> accuracy: 59.6
 >>> Training time: 10.337994813919067
