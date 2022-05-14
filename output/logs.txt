@@ -30,7 +30,7 @@ learning_rate_init=0.01
 >>> Training time: 190.21204781532288
 learning_rate_init=0.001
 >>> accuracy: 54.8
->>> Training time: 152.0666069984436
+>>> Training time: 127.51611971855164
 learning_rate_init=0.0001
 >>> accuracy: 49.6
 >>> Training time: 137.17851066589355
