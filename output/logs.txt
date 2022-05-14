@@ -13,8 +13,27 @@ Loaded all features for all audios
 >>> accuracy: 41.2
 >>> Training time: 1.4138338565826416
 === Neural Network ===
+hidden_layer_sizes=(150, 100, 50)
+>>> accuracy: 51.8
+>>> Training time: 120.25418186187744
+hidden_layer_sizes=(150, 100, 100, 50)
+>>> accuracy: 52.6
+>>> Training time: 121.31817173957825
+hidden_layer_sizes=(150, 100, 100, 100, 50)
 >>> accuracy: 54.8
 >>> Training time: 117.31081771850586
+hidden_layer_sizes=(150, 100, 100, 100, 100, 50)
+>>> accuracy: 52.2
+>>> Training time: 122.54650402069092
+learning_rate_init=0.01
+>>> accuracy: 47.4
+>>> Training time: 190.21204781532288
+learning_rate_init=0.001
+>>> accuracy: 54.8
+>>> Training time: 152.0666069984436
+learning_rate_init=0.0001
+>>> accuracy: 49.6
+>>> Training time: 137.17851066589355
 === Random Forest ===
 >>> accuracy: 59.6
 >>> Training time: 10.337994813919067

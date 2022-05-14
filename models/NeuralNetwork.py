@@ -12,7 +12,8 @@ class TrainWithNeuralNetwork:
 
         self.name = 'Neural Network'
         self.model = MLPClassifier(hidden_layer_sizes=(150, 100, 100, 100, 50), random_state=1,
-                                   max_iter=1000, early_stopping=True, n_iter_no_change=20)
+                                   max_iter=1000, early_stopping=True, n_iter_no_change=20,
+                                   learning_rate_init=0.001)
 
     def fit(self, x_train, y_train):
         print(f'fitting for {self.name}')
